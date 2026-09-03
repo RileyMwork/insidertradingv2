@@ -1,9 +1,7 @@
 # Virtual environment
 .venv/
-venv/
-env/
 
-# Python
+# Python cache
 __pycache__/
 *.py[cod]
 
@@ -12,9 +10,18 @@ __pycache__/
 .coverage
 htmlcov/
 
+# Type checking
+.mypy_cache/
+
+# Linting/formatting
+.ruff_cache/
+
 # Environment variables
 .env
 
 # IDE
 .vscode/
 .idea/
+
+# Python packaging
+*.egg-info/

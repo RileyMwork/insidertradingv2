@@ -1,11 +1,16 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "insider-trading"
 version = "0.1.0"
-description = "My Python project"
-requires-python = ">=3.12"
+description = "Insider trading application"
+requires-python = ">=3.13"
 
 dependencies = [
     "requests",
+    "pandas",
     "python-dotenv",
 ]
 
@@ -13,8 +18,51 @@ dependencies = [
 dev = [
     "pytest",
     "pytest-cov",
+    "mypy",
+    "ruff",
 ]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+
+# -------------------------
+# Pytest
+# -------------------------
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+
+
+# -------------------------
+# Ruff
+# -------------------------
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "B",
+    "UP",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+
+
+# -------------------------
+# Mypy
+# -------------------------
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_unused_configs = true
+warn_unused_ignores = true
