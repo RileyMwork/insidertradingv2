@@ -1,0 +1,20 @@
+[project]
+name = "insider-trading"
+version = "0.1.0"
+description = "My Python project"
+requires-python = ">=3.12"
+
+dependencies = [
+    "requests",
+    "python-dotenv",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
