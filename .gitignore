@@ -28,3 +28,11 @@ htmlcov/
 
 # Drawio files
 *.dio
+
+# Database files
+*.db
+
+# Data
+data
+data/
+data/*
