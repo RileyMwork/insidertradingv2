@@ -1,5 +1,5 @@
 
-from datetime import date, date, datetime
+from datetime import date, datetime
 from decimal import Decimal
 
 from insider_trading.model.filing import Filing
