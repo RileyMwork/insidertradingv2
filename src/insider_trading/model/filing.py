@@ -1,14 +1,11 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date, datetime
-
-from insider_trading.model.insider_transaction import InsiderTransaction
 
 
 @dataclass(frozen=True)
 class Filing:
 
     # Metadata fields
-    id: int
     link: str
 
     # Document Info
@@ -35,5 +32,6 @@ class Filing:
     issuer_organization_name: str
     issuer_trading_symbol: str
 
-    # Transaction List
-    transactions: tuple[InsiderTransaction, ...] = field(default_factory=tuple)
+    # Database ID
+    id: int | None = None
+    date_entered_into_db: date = datetime.now().date()

@@ -16,4 +16,4 @@ class InsiderTransaction:
     shares_owned_following_transaction: Decimal
     direct_or_indirect_ownership: str
     nature_of_ownership: str | None
-    filing_id: int
+    filing_id: int | None = None
