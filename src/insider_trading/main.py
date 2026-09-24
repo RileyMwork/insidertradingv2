@@ -1,3 +1,8 @@
+# -----------------------------------------------------------------------------------------
+# Testing Models
+
+
+
 # from datetime import date, datetime
 # from decimal import Decimal
 
@@ -47,3 +52,12 @@
 #     issuer_trading_symbol="AAPL",
 # )
 
+
+# -----------------------------------------------------------------------------------------
+# Testing Repository
+
+# from insider_trading.repository.db_connection import DbConnection
+
+
+# db_connection = DbConnection()
+# print(db_connection.connect())

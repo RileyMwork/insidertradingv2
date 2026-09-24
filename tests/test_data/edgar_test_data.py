@@ -58,6 +58,32 @@ class EdgarTestData:
                     issuer_trading_symbol="TEST",
             )
 
+        self.test_filing_3 = Filing(
+                            link="https://www.sec.gov/Archives/edgar/data/320199/example.xml",
+                            # Document Info
+                            acceptance_datetime=datetime(2024, 9, 19, 16, 32, 10),
+                            conformed_submission_type=4,
+                            conformed_period_of_report=datetime(2024, 9, 18),
+                            public_document_count=1,
+                            filed_as_of_date=date(2024, 9, 19),
+                            date_as_of_change=date(2024, 9, 19),
+                            # Reporting Owner Info
+                            company_conformed_name="Test Inc.",
+                            reporting_owner_cik="0001234567",
+                            reporting_owner_isDirector=True,
+                            reporting_owner_isOfficer=False,
+                            reporting_owner_isTenPercentOwner=False,
+                            reporting_owner_isOther=False,
+                            reporting_owner_officer_title="",
+                            # Issuer Info
+                            issuer_company_conformed_name="Test Inc.",
+                            issuer_cik="0000320199",
+                            issuer_sic="3571",
+                            issuer_organization_name="Test Inc.",
+                            issuer_trading_symbol="TEST",
+                            date_entered_into_db=date(2024, 9, 20)
+                    )
+
         self.test_transaction_1 = InsiderTransaction(
                     issuer_trading_symbol="TEST",
                     security_title="Common Stock",
@@ -86,4 +112,19 @@ class EdgarTestData:
                             direct_or_indirect_ownership="D",
                             nature_of_ownership=None,
                             filing_id=self.test_filing_2.id
+                    )
+
+        self.test_transaction_3 = InsiderTransaction(
+                            issuer_trading_symbol="TEST",
+                            security_title="Common Stock",
+                            transaction_date=date(2024, 9, 18),
+                            transaction_code="P",
+                            equity_swap_involved=False,
+                            transaction_shares=Decimal("50"),
+                            transaction_price_per_share=Decimal("15.50"),
+                            transaction_acquired_disposed_code="A",
+                            shares_owned_following_transaction=Decimal("1250"),
+                            direct_or_indirect_ownership="D",
+                            nature_of_ownership=None,
+                            filing_id=self.test_filing_1.id
                     )
