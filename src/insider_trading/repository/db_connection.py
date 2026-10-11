@@ -8,16 +8,13 @@ load_dotenv()
 
 class DbConnection:
     def __init__(self, conn: sqlite3.Connection | None = None) -> None:
-        db_name = os.getenv("DB_NAME")
-        if db_name is None:
+        self.db_name = os.getenv("DB_NAME")
+        if self.db_name is None:
             raise ValueError("DB_NAME environment variable is not set")
 
-        self.db_name = db_name
-        self.base_dir = Path(__file__).resolve().parent.parent
-
-        self.resources_dir = self.base_dir / "resources"
-        self.resources_dir.mkdir(exist_ok=True)
-
+        self.base_dir = Path(__file__).resolve().parents[3]
+        self.resources_dir = self.base_dir / "data"
+        self.resources_dir.mkdir(parents=True, exist_ok=True)
         self.db_path = self.resources_dir / self.db_name
 
         self.conn = conn or self.connect()

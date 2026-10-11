@@ -61,3 +61,8 @@
 
 # db_connection = DbConnection()
 # print(db_connection.connect())
+
+# from insider_trading.repository.edgar.edgar_repository import EdgarRepository
+
+# edgar_repository = EdgarRepository()
+# print(edgar_repository.get_latest_date_entered_into_db())
