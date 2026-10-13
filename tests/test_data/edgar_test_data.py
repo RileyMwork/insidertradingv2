@@ -130,3 +130,9 @@ class EdgarTestData:
                             nature_of_ownership=None,
                             filing_id=self.test_filing_1.id
                     )
+
+    def get_test_filings(self) -> list[Filing]:
+        return [self.test_filing_1, self.test_filing_2, self.test_filing_3]
+
+    def get_test_transactions(self) -> list[InsiderTransaction]:
+        return [self.test_transaction_1, self.test_transaction_2, self.test_transaction_3]

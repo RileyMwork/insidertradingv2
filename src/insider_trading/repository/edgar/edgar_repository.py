@@ -13,8 +13,8 @@ class EdgarRepository(SelectBase, InsertBase):
         self.filing_table = "filing"
         self.insider_transaction_table = "insider_transaction"
 
-    def insert_all_transactions(self, df : pd.DataFrame) -> int | None:
-        inserted_rows = self.insert_all_from_df(df, self.insider_transaction_table)
+    def insert_all_transactions(self, df : pd.DataFrame, table: str) -> int | None:
+        inserted_rows = self.insert_all_from_df(df, table)
         return inserted_rows
 
     def get_latest_date_entered_into_db(self) -> str | None:
