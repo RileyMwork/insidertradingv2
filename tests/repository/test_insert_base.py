@@ -1,27 +1,79 @@
-# import os
-# import sqlite3
+import sqlite3
+from collections.abc import Generator
+from typing import Any
 
-# from dotenv import load_dotenv
+import pandas as pd
+import pytest
 
-# load_dotenv()
+from insider_trading.repository.db_connection import DbConnection
+from insider_trading.repository.insert_base import InsertBase
 
-# def test_db_connection() -> None:
-#     db_location = os.getenv("DB_LOCATION")
-#     if not db_location:
-#         raise ValueError("DB_LOCATION environment variable is not set")
 
-#     conn = sqlite3.connect(db_location)
-#     cursor = conn.cursor()
+class TestInsertBase:
+    # Declare class attributes for mypy
+    test_table: str
+    db_connection: DbConnection
+    connection: sqlite3.Connection
+    insert_base: InsertBase
+    cursor: sqlite3.Cursor
 
-#     # Check if the connection is open
-#     assert conn is not None, "Failed to establish a database connection"
+    @pytest.fixture(autouse=True, scope="class")
+    @classmethod
+    def setup_and_teardown(cls) -> Generator[None, Any]:
+        # Setup
+        cls.test_table = "test_table"
 
-#     # Check if the connection is valid by executing a simple query
-#     cursor.execute("SELECT sqlite_version();")
-#     version = cursor.fetchone()
-#     assert version is not None, "Failed to execute query on the database"
+        cls.db_connection = DbConnection()
+        cls.connection = cls.db_connection.connect()
 
-#     print(f"SQLite version: {version[0]}")
+        cls.insert_base = InsertBase(cls.connection)
+        cls.cursor = cls.connection.cursor()
 
-#     # Close the connection
-#     conn.close()
+        sql = """
+            CREATE TABLE IF NOT EXISTS test_table (
+                id INTEGER PRIMARY KEY,
+                name TEXT,
+                age INTEGER
+            )
+        """
+        cls.cursor.execute(sql)
+        cls.connection.commit()
+
+        yield
+
+        # Teardown
+        try:
+            cls.cursor.execute("DROP TABLE IF EXISTS test_table")
+            cls.connection.commit()
+        finally:
+            cls.cursor.close()
+            cls.connection.close()
+
+    def test_insert_all_from_df(self) -> None:
+        entry = pd.DataFrame({
+            "name": ["Alice", "Bob"],
+            "age": [30, 25]
+        })
+
+        inserted_rows = self.insert_base.insert_all_from_df(
+            entry, self.test_table
+        )
+
+        assert inserted_rows == 2
+
+    def test_insert(self) -> None:
+        columns = ["name", "age"]
+        values = ("Charlie", 28)
+
+        last_row_id = self.insert_base.insert(
+            self.test_table, columns, values
+        )
+
+        assert last_row_id is not None
+
+        self.cursor.execute(f"SELECT * FROM {self.test_table} WHERE id = ?", (last_row_id,))
+        row = self.cursor.fetchone()
+
+        assert row is not None
+        assert row[1] == "Charlie"
+        assert row[2] == 28
