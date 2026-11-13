@@ -3,15 +3,15 @@ from datetime import date
 
 import pytest
 
-from insider_trading.api.edgar.index_file_link_builder import IndexFileLinkBuilder
+from insider_trading.api.edgar.fetch_index_files import FetchIndexFiles
 
 
-class TestIndexFileLinkBuilder:
-    builder: IndexFileLinkBuilder
+class TestFetchIndexFiles:
+    builder: FetchIndexFiles
 
     @pytest.fixture(autouse=True)
     def setup(self) -> None:
-        self.builder = IndexFileLinkBuilder()
+        self.builder = FetchIndexFiles()
 
     def test_build_index_links_with_string_dates(self) -> None:
         start_date = "2026-10-05"

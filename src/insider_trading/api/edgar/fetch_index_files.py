@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta
 from insider_trading.api.edgar.edgar_api_base import EdgarApiBase
 
 
-class IndexFileLinkBuilder(EdgarApiBase):
+class FetchIndexFiles(EdgarApiBase):
     def __init__(self) -> None:
         super().__init__()
         self.base_endpoint = self.base_url + "edgar/daily-index/"
