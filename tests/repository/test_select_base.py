@@ -73,7 +73,7 @@ class TestSelectBase:
             limit
         )
 
-        assert result == (1, "Alice", 30)
+        assert result == [(1, "Alice", 30)]
 
     def test_select_raw(self) -> None:
         sql = f"SELECT * FROM {self.test_table} WHERE age > 25"
