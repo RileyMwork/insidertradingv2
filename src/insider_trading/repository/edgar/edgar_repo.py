@@ -49,3 +49,7 @@ class EdgarRepo(DbConnection):
         where_values = [filing_date]
 
         return self.select(select_columns, table_name, where_columns, where_values)
+
+    def get_all_distinct_filed_dates(self) -> list[str]:
+        rows, columns = self.select_raw(f"SELECT DISTINCT filed_as_of_date FROM {self.filing_table} ORDER BY filed_as_of_date DESC")  # noqa: E501
+        return [row[0] for row in rows]

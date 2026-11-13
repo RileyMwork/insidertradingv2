@@ -74,3 +74,20 @@ class TestEdgarRepo:
     
         assert len(actual_rows) == 5
         assert actual_rows == expected_rows
+
+    def test_get_all_distinct_filed_dates(self) -> None:
+        all_filed_dates = self.edgar_repo.select(
+            ["filed_as_of_date"],
+            self.edgar_repo.filing_table,
+        )
+
+        actual_filed_dates = self.edgar_repo.get_all_distinct_filed_dates()
+
+        expected_filed_dates = sorted(
+            {row[0] for row in all_filed_dates},
+            reverse=True,
+        )
+
+        assert actual_filed_dates == expected_filed_dates
+        assert len(actual_filed_dates) == len(set(actual_filed_dates))
+        assert actual_filed_dates == sorted(actual_filed_dates, reverse=True)
