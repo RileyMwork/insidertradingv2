@@ -1,7 +1,7 @@
-
 from datetime import date
 
 import pytest
+import requests
 
 from insider_trading.api.edgar.fetch_index_files import FetchIndexFiles
 
@@ -186,3 +186,153 @@ class TestFetchIndexFiles:
 
         assert actual_urls == expected_urls
         assert len(actual_urls) == 1
+
+        # -------------------------------------------------------------------------
+    # fetch_index_file
+    # -------------------------------------------------------------------------
+
+    def test_fetch_index_file_returns_response_text(self) -> None:
+        url = (
+            f"{self.builder.base_endpoint}"
+            "2026/QTR4/master.20261005.idx"
+        )
+
+        actual_content = self.builder.fetch_index_file(url)
+
+        assert isinstance(actual_content, str)
+        assert len(actual_content) > 0
+        assert "CIK" in actual_content
+
+    def test_fetch_index_file_raises_http_error(self) -> None:
+        url = (
+            f"{self.builder.base_endpoint}"
+            "2026/QTR4/master.99999999.idx"
+        )
+
+        with pytest.raises(requests.HTTPError):
+            self.builder.fetch_index_file(url)
+
+    # -------------------------------------------------------------------------
+    # fetch_index_files
+    # -------------------------------------------------------------------------
+
+    def test_fetch_index_files_returns_multiple_files(self) -> None:
+        urls: list[str] = [
+            f"{self.builder.base_endpoint}2026/QTR4/master.20261005.idx",
+            f"{self.builder.base_endpoint}2026/QTR4/master.20261006.idx",
+            f"{self.builder.base_endpoint}2026/QTR4/master.20261007.idx",
+        ]
+
+        actual_files = self.builder.fetch_index_files(urls)
+
+        assert isinstance(actual_files, dict)
+        assert len(actual_files) == 3
+
+        for url in urls:
+            assert url in actual_files
+            assert isinstance(actual_files[url], str)
+            assert len(actual_files[url]) > 0
+            assert "CIK" in actual_files[url]
+
+    def test_fetch_index_files_returns_empty_dict_for_empty_list(
+        self,
+    ) -> None:
+        urls: list[str] = []
+
+        actual_files = self.builder.fetch_index_files(urls)
+
+        assert actual_files == {}
+
+    def test_fetch_index_files_raises_http_error(self) -> None:
+        urls: list[str] = [
+            (
+                f"{self.builder.base_endpoint}"
+                "2026/QTR4/master.99999999.idx"
+            ),
+        ]
+
+        with pytest.raises(requests.HTTPError):
+            self.builder.fetch_index_files(urls)
+
+    # -------------------------------------------------------------------------
+    # fetch_index_files_for_date_range
+    # -------------------------------------------------------------------------
+
+    def test_fetch_index_files_for_date_range_with_string_dates(
+        self,
+    ) -> None:
+        start_date = "2026-10-05"
+        end_date = "2026-10-09"
+        dates_to_exclude: list[str | date] = [
+            "2026-10-07",
+        ]
+
+        actual_files = self.builder.fetch_index_files_for_date_range(
+            start_date,
+            end_date,
+            dates_to_exclude,
+        )
+
+        expected_urls: list[str] = [
+            f"{self.builder.base_endpoint}2026/QTR4/master.20261005.idx",
+            f"{self.builder.base_endpoint}2026/QTR4/master.20261006.idx",
+            f"{self.builder.base_endpoint}2026/QTR4/master.20261008.idx",
+            f"{self.builder.base_endpoint}2026/QTR4/master.20261009.idx",
+        ]
+
+        assert list(actual_files.keys()) == expected_urls
+
+        for content in actual_files.values():
+            assert isinstance(content, str)
+            assert len(content) > 0
+            assert "CIK" in content
+
+    def test_fetch_index_files_for_date_range_with_date_objects(
+        self,
+    ) -> None:
+        start_date = date(2026, 10, 5)
+        end_date = date(2026, 10, 7)
+
+        dates_to_exclude: list[str | date] = [
+            date(2026, 10, 6),
+        ]
+
+        actual_files = self.builder.fetch_index_files_for_date_range(
+            start_date,
+            end_date,
+            dates_to_exclude,
+        )
+
+        expected_urls: list[str] = [
+            f"{self.builder.base_endpoint}2026/QTR4/master.20261005.idx",
+            f"{self.builder.base_endpoint}2026/QTR4/master.20261007.idx",
+        ]
+
+        assert list(actual_files.keys()) == expected_urls
+
+        for content in actual_files.values():
+            assert isinstance(content, str)
+            assert len(content) > 0
+            assert "CIK" in content
+
+    def test_fetch_index_files_for_date_range_returns_empty_dict(
+        self,
+    ) -> None:
+        actual_files = self.builder.fetch_index_files_for_date_range(
+            "2026-10-10",
+            "2026-10-11",
+            [],
+        )
+
+        assert actual_files == {}
+
+    # -------------------------------------------------------------------------
+    # fetch_todays_index_file
+    # -------------------------------------------------------------------------
+
+    def test_get_latest_index_file_returns_content(self) -> None:
+        actual_content = self.builder.get_latest_index_file()
+    
+        assert isinstance(actual_content, str)
+        assert len(actual_content) > 0
+        assert "CIK" in actual_content
