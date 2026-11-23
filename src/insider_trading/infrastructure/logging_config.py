@@ -11,6 +11,9 @@ def configure_logging() -> None:
     log_directory = project_root / "logs"
     log_directory.mkdir(parents=True, exist_ok=True)
 
+    timestamp: str = datetime.now().strftime("%Y-%m-%d__%H-%M-%S")
+    log_file: Path = log_directory / f"application_{timestamp}.log"
+
     logging.basicConfig(
         level=logging.INFO,
         format=(
@@ -20,7 +23,7 @@ def configure_logging() -> None:
         handlers=[
             logging.StreamHandler(sys.stdout),
             RotatingFileHandler(
-                filename=log_directory / f"application_{datetime.now().strftime('%Y-%m-%d__%H:%M:%S')}.log",  # noqa: E501
+                filename=log_file,
                 maxBytes=5_000_000,
                 backupCount=5,
                 encoding="utf-8",
