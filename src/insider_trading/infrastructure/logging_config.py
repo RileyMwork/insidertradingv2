@@ -20,7 +20,7 @@ def configure_logging() -> None:
         handlers=[
             logging.StreamHandler(sys.stdout),
             RotatingFileHandler(
-                filename=log_directory / f"application_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.log",  # noqa: E501
+                filename=log_directory / f"application_{datetime.now().strftime('%Y-%m-%d__%H:%M:%S')}.log",  # noqa: E501
                 maxBytes=5_000_000,
                 backupCount=5,
                 encoding="utf-8",
