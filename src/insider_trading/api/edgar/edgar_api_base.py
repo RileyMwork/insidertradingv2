@@ -13,9 +13,7 @@ class EdgarApiBase(BaseHttpClient):
         sec_user_agent = os.getenv("SEC_USER_AGENT")
 
         if not sec_user_agent:
-            raise ValueError(
-                "SEC_USER_AGENT environment variable is not configured."
-            )
+            raise ValueError("SEC_USER_AGENT environment variable is not configured.")
 
         super().__init__(
             user_agent=sec_user_agent,

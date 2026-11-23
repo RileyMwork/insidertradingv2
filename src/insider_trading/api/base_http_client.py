@@ -1,4 +1,3 @@
-
 import logging
 import math
 import threading
@@ -152,6 +151,9 @@ class BaseHttpClient:
             requests.RequestException: If raise_on_error is True and a
                 request fails.
         """
+        if not 1 <= log_percent <= 100:
+            raise ValueError("log_percent must be between 1 and 100.")
+
         if not urls:
             self.logger.warning("No URLs provided for fetching.")
             return []
@@ -171,8 +173,7 @@ class BaseHttpClient:
 
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_index: dict[Any, int] = {
-                executor.submit(self.fetch, url, processor): index
-                for index, url in enumerate(urls)
+                executor.submit(self.fetch, url, processor): index for index, url in enumerate(urls)
             }
 
             for future in as_completed(future_to_index):
@@ -188,10 +189,13 @@ class BaseHttpClient:
                     errors.append(error)
                     progress_failed += 1
 
-                # Log every 10% of completed requests and on final completion.
+                progress_interval: int = max(
+                    1,
+                    math.ceil(total * (log_percent / 100)),
+                )
+
                 if show_progress and (
-                    progress_completed % math.floor(total * (log_percent / 100)) == 0
-                    or progress_completed == total
+                    progress_completed % progress_interval == 0 or progress_completed == total
                 ):
                     self._log_progress(
                         total,
@@ -208,14 +212,9 @@ class BaseHttpClient:
 
         if raise_on_error and errors:
             self.logger.error(
-                "Fetch completed with %s failed requests. "
-                "Raising the first request exception.",
+                "Fetch completed with %s failed requests. Raising the first request exception.",
                 len(errors),
             )
             raise errors[0]
 
-        return [
-            result
-            for result in ordered_results
-            if result is not None
-        ]
+        return [result for result in ordered_results if result is not None]

@@ -1,3 +1,4 @@
+
 [build-system]
 requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
@@ -7,7 +8,6 @@ name = "insider-trading"
 version = "0.1.0"
 description = "Insider trading application"
 requires-python = ">=3.13"
-
 dependencies = [
     "requests",
     "pandas",
@@ -20,11 +20,12 @@ dev = [
     "pytest-cov",
     "mypy",
     "ruff",
+    "pandas-stubs",
+    "types-requests",
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
 
 # -------------------------
 # Pytest
@@ -35,7 +36,6 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 pythonpath = [".", "src"]
-
 
 # -------------------------
 # Ruff
@@ -56,7 +56,6 @@ select = [
 
 [tool.ruff.format]
 quote-style = "double"
-
 
 # -------------------------
 # Mypy

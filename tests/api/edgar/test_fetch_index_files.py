@@ -188,14 +188,12 @@ class TestFetchIndexFiles:
         assert len(actual_urls) == 1
 
         # -------------------------------------------------------------------------
+
     # fetch_index_file
     # -------------------------------------------------------------------------
 
     def test_fetch_index_file_returns_response_text(self) -> None:
-        url = (
-            f"{self.builder.base_endpoint}"
-            "2026/QTR4/master.20261005.idx"
-        )
+        url = f"{self.builder.base_endpoint}2026/QTR4/master.20261005.idx"
 
         actual_content = self.builder.fetch_index_file(url)
 
@@ -205,15 +203,10 @@ class TestFetchIndexFiles:
 
     def test_fetch_index_files_skips_failed_requests(self) -> None:
         urls: list[str] = [
-            (
-                f"{self.builder.base_endpoint}"
-                "2026/QTR4/master.99999999.idx"
-            ),
+            (f"{self.builder.base_endpoint}2026/QTR4/master.99999999.idx"),
         ]
 
-        actual_files: dict[str, str] = (
-            self.builder.fetch_index_files(urls)
-        )
+        actual_files: dict[str, str] = self.builder.fetch_index_files(urls)
 
         assert actual_files == {}
         assert self.builder.success == 0
@@ -252,18 +245,15 @@ class TestFetchIndexFiles:
 
     def test_fetch_index_files_raises_http_error(self) -> None:
         urls: list[str] = [
-            (
-                f"{self.builder.base_endpoint}"
-                "2026/QTR4/master.99999999.idx"
-            ),
+            (f"{self.builder.base_endpoint}2026/QTR4/master.99999999.idx"),
         ]
-    
+
         with pytest.raises(requests.HTTPError):
             self.builder.fetch_index_files(
                 urls,
                 raise_on_error=True,
             )
-    
+
         assert self.builder.success == 0
         assert self.builder.failed == 1
 
@@ -345,7 +335,7 @@ class TestFetchIndexFiles:
 
     def test_get_latest_index_file_returns_content(self) -> None:
         actual_content = self.builder.get_latest_index_file()
-    
+
         assert isinstance(actual_content, str)
         assert len(actual_content) > 0
         assert "CIK" in actual_content

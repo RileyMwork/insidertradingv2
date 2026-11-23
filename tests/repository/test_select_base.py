@@ -53,7 +53,6 @@ class TestSelectBase:
             cls.cursor.close()
             cls.connection.close()
 
-
     def test_select(self) -> None:
         select_columns = ["id", "name", "age"]
         table_name = self.test_table
@@ -70,7 +69,7 @@ class TestSelectBase:
             where_values,
             order_by_column,
             order_by_direction,
-            limit
+            limit,
         )
 
         assert result == [(1, "Alice", 30)]

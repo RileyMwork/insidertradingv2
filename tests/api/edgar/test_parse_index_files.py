@@ -1,4 +1,3 @@
-
 import pytest
 
 from insider_trading.api.edgar.parse_index_files import ParseIndexFiles
@@ -30,12 +29,9 @@ class TestParseIndexFiles:
         )
 
         expected_links = [
-            f"{self.parser.base_url}"
-            "edgar/data/4977/0001104659-26-130427.txt",
-            f"{self.parser.base_url}"
-            "edgar/data/50725/0001628280-26-075300.txt",
-            f"{self.parser.base_url}"
-            "edgar/data/5981/0001193125-26-470657.txt",
+            f"{self.parser.base_url}edgar/data/4977/0001104659-26-130427.txt",
+            f"{self.parser.base_url}edgar/data/50725/0001628280-26-075300.txt",
+            f"{self.parser.base_url}edgar/data/5981/0001193125-26-470657.txt",
         ]
 
         assert actual_links == expected_links
@@ -58,10 +54,8 @@ class TestParseIndexFiles:
         )
 
         expected_links = [
-            f"{self.parser.base_url}"
-            "edgar/data/49754/0001193125-26-469349.txt",
-            f"{self.parser.base_url}"
-            "edgar/data/54476/0001193125-26-470295.txt",
+            f"{self.parser.base_url}edgar/data/49754/0001193125-26-469349.txt",
+            f"{self.parser.base_url}edgar/data/54476/0001193125-26-470295.txt",
         ]
 
         assert actual_links == expected_links
@@ -84,12 +78,9 @@ class TestParseIndexFiles:
         )
 
         expected_links = [
-            f"{self.parser.base_url}"
-            "edgar/data/4977/0001104659-26-130427.txt",
-            f"{self.parser.base_url}"
-            "edgar/data/49754/0001193125-26-469349.txt",
-            f"{self.parser.base_url}"
-            "edgar/data/67887/0001628280-26-075202.txt",
+            f"{self.parser.base_url}edgar/data/4977/0001104659-26-130427.txt",
+            f"{self.parser.base_url}edgar/data/49754/0001193125-26-469349.txt",
+            f"{self.parser.base_url}edgar/data/67887/0001628280-26-075202.txt",
         ]
 
         assert actual_links == expected_links
@@ -113,12 +104,9 @@ class TestParseIndexFiles:
         )
 
         expected_links = [
-            f"{self.parser.base_url}"
-            "edgar/data/63296/0000063296-26-000128.txt",
-            f"{self.parser.base_url}"
-            "edgar/data/63296/0000063296-26-000129.txt",
-            f"{self.parser.base_url}"
-            "edgar/data/63296/0000063296-26-000130.txt",
+            f"{self.parser.base_url}edgar/data/63296/0000063296-26-000128.txt",
+            f"{self.parser.base_url}edgar/data/63296/0000063296-26-000129.txt",
+            f"{self.parser.base_url}edgar/data/63296/0000063296-26-000130.txt",
         ]
 
         assert actual_links == expected_links
@@ -139,8 +127,7 @@ class TestParseIndexFiles:
         )
 
         expected_links = [
-            f"{self.parser.base_url}"
-            "edgar/data/4977/0001104659-26-130427.txt",
+            f"{self.parser.base_url}edgar/data/4977/0001104659-26-130427.txt",
         ]
 
         assert actual_links == expected_links
@@ -161,8 +148,7 @@ class TestParseIndexFiles:
         )
 
         expected_links = [
-            f"{self.parser.base_url}"
-            "edgar/data/52827/0000052827-26-000110.txt",
+            f"{self.parser.base_url}edgar/data/52827/0000052827-26-000110.txt",
         ]
 
         assert actual_links == expected_links
@@ -209,10 +195,7 @@ class TestParseIndexFiles:
             index_file_text,
         )
 
-        expected_link = (
-            f"{self.parser.base_url}"
-            "edgar/data/4977/0001104659-26-130427.txt"
-        )
+        expected_link = f"{self.parser.base_url}edgar/data/4977/0001104659-26-130427.txt"
 
         assert actual_links == [expected_link, expected_link]
         assert len(actual_links) == 2

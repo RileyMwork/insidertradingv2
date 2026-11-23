@@ -4,7 +4,6 @@ from datetime import date, datetime
 
 @dataclass(frozen=True)
 class Filing:
-
     # Metadata fields
     link: str
 

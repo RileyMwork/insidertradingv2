@@ -1,4 +1,3 @@
-
 import logging
 import sqlite3
 from typing import Any
@@ -28,16 +27,12 @@ class SelectBase(DbConnection):
             where_values = []
 
         if len(where_columns) != len(where_values):
-            raise ValueError(
-                "where_columns and where_values must have the same length."
-            )
+            raise ValueError("where_columns and where_values must have the same length.")
 
         cursor = self.conn.cursor()
 
         if where_columns:
-            where_clause = "WHERE " + " AND ".join(
-                [f"{col} = ?" for col in where_columns]
-            )
+            where_clause = "WHERE " + " AND ".join([f"{col} = ?" for col in where_columns])
         else:
             where_clause = ""
 
@@ -66,9 +61,7 @@ class SelectBase(DbConnection):
 
             cursor.execute(statement, where_values)
 
-            rows: list[tuple[Any, ...]] = [
-                tuple(row) for row in cursor.fetchall()
-            ]
+            rows: list[tuple[Any, ...]] = [tuple(row) for row in cursor.fetchall()]
 
             self.logger.info(
                 "SELECT query returned %s row(s) from table '%s'.",
@@ -99,14 +92,10 @@ class SelectBase(DbConnection):
 
             cursor.execute(sql)
 
-            rows: list[tuple[Any, ...]] = [
-                tuple(row) for row in cursor.fetchall()
-            ]
+            rows: list[tuple[Any, ...]] = [tuple(row) for row in cursor.fetchall()]
 
             columns: list[str] = (
-                [col[0] for col in cursor.description]
-                if cursor.description is not None
-                else []
+                [col[0] for col in cursor.description] if cursor.description is not None else []
             )
 
             self.logger.info(

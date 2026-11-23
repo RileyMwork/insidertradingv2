@@ -4,6 +4,7 @@ from insider_trading.repository.db_connection import DbConnection
 
 load_dotenv()
 
+
 def test_db_connection() -> None:
     db_connection = DbConnection()
     conn = db_connection.connect()

@@ -1,4 +1,3 @@
-
 import logging
 import sqlite3
 from typing import Any
@@ -68,11 +67,7 @@ class InsertBase(DbConnection):
 
         placeholders = ", ".join(["?" for _ in values])
 
-        statement = (
-            f"INSERT INTO {table_name} "
-            f"({', '.join(columns)}) "
-            f"VALUES ({placeholders})"
-        )
+        statement = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({placeholders})"
 
         try:
             cursor.execute(statement, values)

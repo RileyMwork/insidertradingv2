@@ -1,4 +1,3 @@
-
 import logging
 from datetime import date, datetime, timedelta
 
@@ -39,9 +38,7 @@ class FetchIndexFiles(EdgarApiBase):
         normalized_start_date = normalize(start_date)
         normalized_end_date = normalize(end_date)
 
-        exclude_set: set[date] = {
-            normalize(value) for value in dates_to_exclude
-        }
+        exclude_set: set[date] = {normalize(value) for value in dates_to_exclude}
 
         current_date = normalized_start_date
         urls: list[str] = []
@@ -104,9 +101,7 @@ class FetchIndexFiles(EdgarApiBase):
             Dictionary mapping URLs to their index file contents.
         """
         if not urls:
-            self.logger.warning(
-                "No SEC index file URLs provided for fetching."
-            )
+            self.logger.warning("No SEC index file URLs provided for fetching.")
             return {}
 
         self.logger.info(
@@ -205,23 +200,17 @@ class FetchIndexFiles(EdgarApiBase):
                 return index_file_content
 
             except requests.HTTPError as error:
-                status_code = (
-                    error.response.status_code
-                    if error.response is not None
-                    else None
-                )
+                status_code = error.response.status_code if error.response is not None else None
 
                 if status_code not in (403, 404):
                     self.logger.exception(
-                        "Unexpected HTTP error while fetching index file "
-                        "for %s.",
+                        "Unexpected HTTP error while fetching index file for %s.",
                         target_date,
                     )
                     raise
 
                 self.logger.warning(
-                    "SEC index file request for %s returned HTTP %s. "
-                    "Trying an earlier date.",
+                    "SEC index file request for %s returned HTTP %s. Trying an earlier date.",
                     target_date,
                     status_code,
                 )
@@ -240,6 +229,4 @@ class FetchIndexFiles(EdgarApiBase):
             max_days_back,
         )
 
-        raise FileNotFoundError(
-            f"No index file found within the last {max_days_back} days."
-        )
+        raise FileNotFoundError(f"No index file found within the last {max_days_back} days.")

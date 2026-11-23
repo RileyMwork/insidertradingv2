@@ -1,4 +1,3 @@
-
 import time
 
 from insider_trading.api.edgar.edgar_api_base import EdgarApiBase

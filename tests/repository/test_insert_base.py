@@ -50,14 +50,9 @@ class TestInsertBase:
             cls.connection.close()
 
     def test_insert_all_from_df(self) -> None:
-        entry = pd.DataFrame({
-            "name": ["Alice", "Bob"],
-            "age": [30, 25]
-        })
+        entry = pd.DataFrame({"name": ["Alice", "Bob"], "age": [30, 25]})
 
-        inserted_rows = self.insert_base.insert_all_from_df(
-            entry, self.test_table
-        )
+        inserted_rows = self.insert_base.insert_all_from_df(entry, self.test_table)
 
         assert inserted_rows == 2
 
@@ -65,9 +60,7 @@ class TestInsertBase:
         columns = ["name", "age"]
         values = ("Charlie", 28)
 
-        last_row_id = self.insert_base.insert(
-            self.test_table, columns, values
-        )
+        last_row_id = self.insert_base.insert(self.test_table, columns, values)
 
         assert last_row_id is not None
 

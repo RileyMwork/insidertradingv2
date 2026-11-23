@@ -1,4 +1,3 @@
-
 import logging
 import sqlite3
 from typing import Any
@@ -95,10 +94,7 @@ class EdgarRepo(DbConnection):
             self.filing_table,
         )
 
-        sql = (
-            f"SELECT MAX(date_entered_into_db) "
-            f"FROM {self.filing_table}"
-        )
+        sql = f"SELECT MAX(date_entered_into_db) FROM {self.filing_table}"
 
         rows, _ = self.select_raw(sql)
 
@@ -131,8 +127,7 @@ class EdgarRepo(DbConnection):
         select_columns: list[str] = ["it.*", "f.*"]
 
         table_name = (
-            f"{self.insider_transaction_table} it "
-            f"JOIN {self.filing_table} f ON it.filing_id = f.id"
+            f"{self.insider_transaction_table} it JOIN {self.filing_table} f ON it.filing_id = f.id"
         )
 
         where_columns: list[str] = ["f.date_entered_into_db"]
@@ -159,9 +154,7 @@ class EdgarRepo(DbConnection):
 
         rows, _ = self.select_raw(sql)
 
-        filed_dates: list[str] = [
-            row[0] for row in rows if isinstance(row[0], str)
-        ]
+        filed_dates: list[str] = [row[0] for row in rows if isinstance(row[0], str)]
 
         self.logger.info(
             "Retrieved %s distinct filing dates.",

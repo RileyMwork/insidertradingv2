@@ -48,7 +48,9 @@ class TestEdgarRepo:
         assert "date_entered_into_db" in columns
 
     def test_get_latest_filing_date(self) -> None:
-        all_filing_dates = self.edgar_repo.select(["date_entered_into_db"], self.edgar_repo.filing_table)  # noqa: E501
+        all_filing_dates = self.edgar_repo.select(
+            ["date_entered_into_db"], self.edgar_repo.filing_table
+        )  # noqa: E501
 
         latest_filing_date = self.edgar_repo.get_latest_filing_date()
 
@@ -58,7 +60,7 @@ class TestEdgarRepo:
 
     def test_get_insider_transactions_by_filing_date(self) -> None:
         filing_date = "2026-10-01"
-    
+
         expected_rows, _ = self.edgar_repo.select_raw(
             f"""
             SELECT it.*, f.*
@@ -67,11 +69,9 @@ class TestEdgarRepo:
             WHERE f.date_entered_into_db = '{filing_date}'
             """
         )
-    
-        actual_rows = self.edgar_repo.get_insider_transactions_by_filing_date(
-            filing_date
-        )
-    
+
+        actual_rows = self.edgar_repo.get_insider_transactions_by_filing_date(filing_date)
+
         assert len(actual_rows) == 5
         assert actual_rows == expected_rows
 
