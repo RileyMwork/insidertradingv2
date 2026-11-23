@@ -122,6 +122,13 @@ pytest
 # ----------------------------------------
 
 echo ""
+echo "[9/9] Pushing updates to Database to Github..."
+
+git add data/insider_trading_v2.db
+git commit -m "Update database"
+git push origin main
+
+echo ""
 echo "========================================"
 echo "Update and validation completed!"
 echo "========================================"
