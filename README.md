@@ -7,6 +7,6 @@
 `ruff format .`\
 `ruff check .`\
 `mypy src`\
-`pytest`\
+`pytest`
 
 ---
