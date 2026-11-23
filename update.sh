@@ -35,10 +35,10 @@ done
 echo ""
 echo "[2/8] Checking Git status..."
 
-if ! git diff --quiet || ! git diff --cached --quiet || \
+if ! git diff --quiet -- . ':(exclude)data/insider_trading_v2.db' ||
+   ! git diff --cached --quiet -- . ':(exclude)data/insider_trading_v2.db' ||
    [ -n "$(git ls-files --others --exclude-standard)" ]; then
     echo "ERROR: You have local changes or untracked files."
-    echo "Please commit, stash, or discard them before updating."
     git status --short
     exit 1
 fi
