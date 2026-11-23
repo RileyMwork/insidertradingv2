@@ -2,8 +2,11 @@
 ---
 
 `.venv\Scripts\Activate.ps1`\
-`pip install -e ".[dev]"`\
+`python -m pip install -e ".[dev]"`\
+`python -m pip check`\
+`ruff format .`\
+`ruff check .`\
+`mypy src`\
 `pytest`\
-`python -m insider_trading.main`
 
 ---
