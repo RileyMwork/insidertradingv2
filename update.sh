@@ -20,7 +20,7 @@ git pull --ff-only origin main
 echo ""
 echo "[2/7] Activating virtual environment..."
 
-source .venv/bin/activate
+source .venv/Scripts/Activate.ps1
 
 # Install dependencies.
 echo ""
