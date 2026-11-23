@@ -1,6 +1,9 @@
 
 #!/usr/bin/env bash
 
+# Ensure this script is executable.
+chmod +x "$0"
+
 set -Eeuo pipefail
 
 # Navigate to the repository directory.
