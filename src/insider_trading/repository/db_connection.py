@@ -1,4 +1,3 @@
-
 import os
 import sqlite3
 from pathlib import Path
@@ -23,9 +22,7 @@ class DbConnection:
             project_root: Path = Path(__file__).resolve().parents[3]
             self.db_location = project_root / self.db_location
 
-        self.conn: sqlite3.Connection = (
-            conn if conn is not None else self.connect()
-        )
+        self.conn: sqlite3.Connection = conn if conn is not None else self.connect()
 
     def connect(self) -> sqlite3.Connection:
         self.db_location.parent.mkdir(parents=True, exist_ok=True)
