@@ -1,57 +1,122 @@
 
 #!/usr/bin/env bash
 
-set -e
+set -Eeuo pipefail
+
+# Navigate to the repository directory.
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$PROJECT_DIR"
 
 echo "========================================"
 echo "Updating InsiderTradingV2"
 echo "========================================"
 
-# Navigate to the repository directory.
-cd "$(dirname "$0")"
+# ----------------------------------------
+# 1. Check required commands
+# ----------------------------------------
 
-# Pull latest changes from GitHub.
 echo ""
-echo "[1/7] Pulling latest changes..."
+echo "[1/8] Checking system requirements..."
 
+for command in git python3; do
+    if ! command -v "$command" >/dev/null 2>&1; then
+        echo "ERROR: $command is not installed."
+        exit 1
+    fi
+done
+
+# ----------------------------------------
+# 2. Check Git working tree
+# ----------------------------------------
+
+echo ""
+echo "[2/8] Checking Git status..."
+
+if ! git diff --quiet || ! git diff --cached --quiet || \
+   [ -n "$(git ls-files --others --exclude-standard)" ]; then
+    echo "ERROR: You have local changes or untracked files."
+    echo "Please commit, stash, or discard them before updating."
+    git status --short
+    exit 1
+fi
+
+# ----------------------------------------
+# 3. Pull latest changes
+# ----------------------------------------
+
+echo ""
+echo "[3/8] Pulling latest changes from GitHub..."
+
+git fetch origin
 git pull --ff-only origin main
 
-# Activate virtual environment.
+# ----------------------------------------
+# 4. Check Python version
+# ----------------------------------------
+
 echo ""
-echo "[2/7] Activating virtual environment..."
+echo "[4/8] Checking Python version..."
 
-source .venv/Scripts/Activate.ps1
+PYTHON_VERSION="$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
 
-# Install dependencies.
+if ! python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 13) else 1)'; then
+    echo "ERROR: Python 3.13 or newer is required."
+    echo "Detected Python version: $PYTHON_VERSION"
+    exit 1
+fi
+
+echo "Python $PYTHON_VERSION detected."
+
+# ----------------------------------------
+# 5. Create and activate virtual environment
+# ----------------------------------------
+
 echo ""
-echo "[3/7] Installing dependencies..."
+echo "[5/8] Setting up virtual environment..."
 
+if [ ! -f ".venv/bin/activate" ]; then
+    echo "Virtual environment not found. Creating one..."
+
+    python3 -m venv .venv
+fi
+
+source .venv/bin/activate
+
+# ----------------------------------------
+# 6. Install dependencies
+# ----------------------------------------
+
+echo ""
+echo "[6/8] Installing dependencies..."
+
+python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
-
-# Check dependencies.
-echo ""
-echo "[4/7] Checking dependencies..."
 
 python -m pip check
 
-# Format code.
+# ----------------------------------------
+# 7. Format and validate code
+# ----------------------------------------
+
 echo ""
-echo "[5/7] Formatting code..."
+echo "[7/8] Formatting and checking code..."
 
 ruff format .
-
-# Run linting.
-echo ""
-echo "[6/7] Running Ruff and mypy..."
-
 ruff check .
 mypy src
 
-# Run tests.
+# ----------------------------------------
+# 8. Run tests
+# ----------------------------------------
+
 echo ""
-echo "[7/7] Running tests..."
+echo "[8/8] Running tests..."
 
 pytest
+
+# ----------------------------------------
+# Finished
+# ----------------------------------------
 
 echo ""
 echo "========================================"
