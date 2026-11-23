@@ -18,22 +18,28 @@ class EdgarRepo(DbConnection):
         self.insider_transaction_table = "insider_transaction"
 
     def insert_all_from_df(self, df: pd.DataFrame, table_name: str) -> int | None:
+        print(f"Inserting {len(df)} rows into {table_name} table")
         return self.insert_base.insert_all_from_df(df, table_name)
 
     def insert(self, table_name: str, columns: list[str], values: tuple[Any, ...]) -> int | None:
+        print(f"Inserting row into {table_name} table")
         return self.insert_base.insert(table_name, columns, values)
 
     def select(self, select_columns: list[str], table_name: str, where_columns: list[str] | None = None, where_values: list[Any] | None = None,) -> list[tuple[Any, ...]]:  # noqa: E501
+        print(f"Selecting from {table_name} table")
         return self.select_base.select(select_columns, table_name, where_columns, where_values)
 
     def select_raw(self, sql: str) -> tuple[list[tuple[Any, ...]], list[str]]:
+        print(f"Executing raw SQL: {sql}")
         return self.select_base.select_raw(sql)
 
     def select_all(self) -> tuple[list[tuple[Any, ...]], list[str]]:
+        print(f"Selecting all from {self.insider_transaction_table} and {self.filing_table} tables")
         sql = (f"SELECT * FROM {self.insider_transaction_table} it JOIN {self.filing_table} f ON it.filing_id = f.id")  # noqa: E501
         return self.select_raw(sql)
 
     def get_latest_filing_date(self) -> str | None:
+        print(f"Getting latest filing date from {self.filing_table} table")
         sql = f"SELECT MAX(date_entered_into_db) FROM {self.filing_table}"
         rows, _ = self.select_raw(sql)
 
@@ -43,6 +49,7 @@ class EdgarRepo(DbConnection):
         return None
 
     def get_insider_transactions_by_filing_date(self, filing_date: str) -> list[tuple[Any, ...]]:
+        print(f"Getting insider transactions for filing date: {filing_date}")
         select_columns = ["it.*", "f.*"]
         table_name = (f"{self.insider_transaction_table} it JOIN {self.filing_table} f ON it.filing_id = f.id")  # noqa: E501
         where_columns = ["f.date_entered_into_db"]
@@ -51,5 +58,6 @@ class EdgarRepo(DbConnection):
         return self.select(select_columns, table_name, where_columns, where_values)
 
     def get_all_distinct_filed_dates(self) -> list[str]:
+        print(f"Getting all distinct filed dates from {self.filing_table} table")
         rows, columns = self.select_raw(f"SELECT DISTINCT filed_as_of_date FROM {self.filing_table} ORDER BY filed_as_of_date DESC")  # noqa: E501
         return [row[0] for row in rows]

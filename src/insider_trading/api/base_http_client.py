@@ -77,6 +77,7 @@ class BaseHttpClient:
 
         return self.session.get(url, **kwargs)
 
+    
     def fetch(
         self,
         url: str,
@@ -84,74 +85,104 @@ class BaseHttpClient:
     ) -> tuple[str, Any | None]:
         """
         Fetch a single URL.
-
+    
         Returns:
             A tuple containing the URL and processed result.
-
-        If processor is None, returns response.text.
-        Otherwise, returns processor(response).
+    
+        Raises:
+            requests.RequestException: If the HTTP request fails.
         """
         try:
             response = self.get(url)
-
-            if not response.ok:
-                self._record_failure()
-                return url, None
-
+            response.raise_for_status()
+    
+            if processor is not None:
+                result = processor(response)
+            else:
+                result = response.text
+    
             self._record_success()
-
-            if processor:
-                return url, processor(response)
-
-            return url, response.text
-
+    
+            return url, result
+    
         except requests.RequestException:
             self._record_failure()
-            return url, None
-
+            raise
+        
+        
     def fetch_all(
         self,
         urls: Sequence[str],
         processor: Callable[[Response], Any] | None = None,
         max_workers: int = 10,
         show_progress: bool = True,
+        raise_on_error: bool = False,
     ) -> list[Any]:
         """
         Fetch many URLs concurrently.
-
+    
+        Successful results are returned in the same order as the input URLs.
+    
+        Args:
+            urls: URLs to fetch.
+            processor: Optional function to process each response.
+            max_workers: Maximum number of concurrent workers.
+            show_progress: Whether to display progress.
+            raise_on_error: Whether to raise an exception if a request fails.
+    
         Returns:
-            A list of successfully processed results.
+            A list containing successfully processed results.
+    
+        Raises:
+            requests.RequestException: If raise_on_error is True and a
+                request fails.
         """
         if not urls:
             return []
-
+    
         self._reset_stats()
-
-        results: list[Any] = []
-        total = len(urls)
-
+    
+        total: int = len(urls)
+        ordered_results: list[Any | None] = [None] * total
+        errors: list[requests.RequestException] = []
+    
         if show_progress:
             print(f"Fetching {total} objects...\n")
-
+    
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = [
-                executor.submit(self.fetch, url, processor)
-                for url in urls
-            ]
-
-            for future in as_completed(futures):
-                _, result = future.result()
-
-                if result is not None:
-                    results.append(result)
-
+            future_to_index: dict[Any, int] = {
+                executor.submit(self.fetch, url, processor): index
+                for index, url in enumerate(urls)
+            }
+    
+            for future in as_completed(future_to_index):
+                index: int = future_to_index[future]
+    
+                try:
+                    _, result = future.result()
+                    ordered_results[index] = result
+    
+                except requests.RequestException as error:
+                    errors.append(error)
+    
                 if show_progress:
                     self._print_progress(total)
-
+    
         if show_progress:
             print()
             print(
                 f"Done. Success: {self.success}, Failed: {self.failed}"
             )
-
-        return results
+    
+        if raise_on_error and errors:
+            raise errors[0]
+    
+        return [
+            result
+            for result in ordered_results
+            if result is not None
+        ]
+    
+    
+    
+    

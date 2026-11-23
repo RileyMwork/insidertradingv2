@@ -51,6 +51,7 @@ class SelectBase(DbConnection):
 
         cursor.execute(statement, where_values)
 
+        print(f"Executed SQL: {statement} with values: {where_values}")
         return [tuple(row) for row in cursor.fetchall()]
 
     
@@ -61,4 +62,5 @@ class SelectBase(DbConnection):
         rows = cursor.fetchall()
         columns = [col[0] for col in cursor.description]
     
+        print(f"Executed raw SQL: {sql}")
         return rows, columns
