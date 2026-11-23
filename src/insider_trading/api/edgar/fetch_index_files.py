@@ -1,4 +1,5 @@
 
+import logging
 from datetime import date, datetime, timedelta
 
 import requests
@@ -9,6 +10,7 @@ from insider_trading.api.edgar.edgar_api_base import EdgarApiBase
 class FetchIndexFiles(EdgarApiBase):
     def __init__(self) -> None:
         super().__init__()
+        self.logger = logging.getLogger(__name__)
         self.base_endpoint = self.base_url + "edgar/daily-index/"
 
     def build_index_links(
@@ -17,9 +19,15 @@ class FetchIndexFiles(EdgarApiBase):
         end_date: str | date,
         dates_to_exclude: list[str | date],
     ) -> list[str]:
-        print(
-            f"Building index links from {start_date} to {end_date} "
-            f"excluding {dates_to_exclude}"
+        self.logger.info(
+            "Building SEC index links from %s to %s.",
+            start_date,
+            end_date,
+        )
+
+        self.logger.debug(
+            "Dates excluded from index link generation: %s",
+            dates_to_exclude,
         )
 
         def normalize(value: str | date) -> date:
@@ -52,15 +60,34 @@ class FetchIndexFiles(EdgarApiBase):
 
             current_date += timedelta(days=1)
 
+        self.logger.info(
+            "Generated %s SEC index links.",
+            len(urls),
+        )
+
         return urls
 
     def fetch_index_file(self, url: str) -> str:
-        response = self.get(url)
-        response.raise_for_status()
-        return response.text
+        self.logger.info("Fetching SEC index file: %s", url)
 
+        try:
+            response = self.get(url)
+            response.raise_for_status()
 
-    
+            self.logger.debug(
+                "Successfully fetched SEC index file: %s",
+                url,
+            )
+
+            return response.text
+
+        except requests.RequestException:
+            self.logger.exception(
+                "Failed to fetch SEC index file: %s",
+                url,
+            )
+            raise
+
     def fetch_index_files(
         self,
         urls: list[str],
@@ -68,29 +95,53 @@ class FetchIndexFiles(EdgarApiBase):
     ) -> dict[str, str]:
         """
         Fetch multiple index files concurrently.
-    
+
         Args:
             urls: URLs of the SEC index files.
             raise_on_error: Whether to raise an exception if a request fails.
-    
+
         Returns:
             Dictionary mapping URLs to their index file contents.
         """
+        if not urls:
+            self.logger.warning(
+                "No SEC index file URLs provided for fetching."
+            )
+            return {}
+
+        self.logger.info(
+            "Starting concurrent fetch of %s SEC index files.",
+            len(urls),
+        )
+
         results: list[tuple[str, str]] = self.fetch_all(
             urls,
             processor=lambda response: (response.url, response.text),
             raise_on_error=raise_on_error,
         )
-    
-        return dict(results)
 
-    
+        index_files: dict[str, str] = dict(results)
+
+        self.logger.info(
+            "Retrieved %s of %s SEC index files.",
+            len(index_files),
+            len(urls),
+        )
+
+        return index_files
+
     def fetch_index_files_for_date_range(
         self,
         start_date: str | date,
         end_date: str | date,
         dates_to_exclude: list[str | date],
     ) -> dict[str, str]:
+        self.logger.info(
+            "Fetching SEC index files for date range %s through %s.",
+            start_date,
+            end_date,
+        )
+
         urls = self.build_index_links(
             start_date,
             end_date,
@@ -106,15 +157,28 @@ class FetchIndexFiles(EdgarApiBase):
         Starts with today's date and works backward, skipping weekends.
         """
         if max_days_back < 0:
+            self.logger.error(
+                "Invalid max_days_back value: %s",
+                max_days_back,
+            )
             raise ValueError("max_days_back cannot be negative")
 
         current_date = date.today()
         last_error: requests.HTTPError | None = None
 
+        self.logger.info(
+            "Searching for the latest SEC index file within the last %s days.",
+            max_days_back,
+        )
+
         for days_back in range(max_days_back + 1):
             target_date = current_date - timedelta(days=days_back)
 
             if target_date.weekday() >= 5:
+                self.logger.debug(
+                    "Skipping %s because it falls on a weekend.",
+                    target_date,
+                )
                 continue
 
             quarter = (target_date.month - 1) // 3 + 1
@@ -126,11 +190,17 @@ class FetchIndexFiles(EdgarApiBase):
             )
 
             try:
-                print(f"Attempting to fetch index file for {target_date}")
+                self.logger.info(
+                    "Attempting to fetch SEC index file for %s.",
+                    target_date,
+                )
 
                 index_file_content = self.fetch_index_file(url)
 
-                print(f"Successfully fetched index file for {target_date}")
+                self.logger.info(
+                    "Successfully fetched SEC index file for %s.",
+                    target_date,
+                )
 
                 return index_file_content
 
@@ -142,12 +212,33 @@ class FetchIndexFiles(EdgarApiBase):
                 )
 
                 if status_code not in (403, 404):
+                    self.logger.exception(
+                        "Unexpected HTTP error while fetching index file "
+                        "for %s.",
+                        target_date,
+                    )
                     raise
+
+                self.logger.warning(
+                    "SEC index file request for %s returned HTTP %s. "
+                    "Trying an earlier date.",
+                    target_date,
+                    status_code,
+                )
 
                 last_error = error
 
         if last_error is not None:
+            self.logger.error(
+                "No accessible SEC index file found within the last %s days.",
+                max_days_back,
+            )
             raise last_error
+
+        self.logger.error(
+            "No SEC index file found within the last %s days.",
+            max_days_back,
+        )
 
         raise FileNotFoundError(
             f"No index file found within the last {max_days_back} days."

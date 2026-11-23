@@ -38,3 +38,6 @@ data/
 data/*
 
 todo.md
+
+logs
+logs/*
