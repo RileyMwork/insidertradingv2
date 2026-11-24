@@ -121,22 +121,6 @@ pytest
 # Finished
 # ----------------------------------------
 
-
-echo ""
-echo "[9/9] Pushing database updates to GitHub..."
-
-git add data/insider_trading_v2.db
-
-if ! git diff --cached --quiet; then
-    git commit -m "Update database"
-    git push origin main
-    echo "Database successfully pushed to GitHub."
-else
-    echo "Database has not changed. Nothing to commit."
-fi
-
-
-echo ""
 echo "========================================"
 echo "Update and validation completed!"
 echo "========================================"
