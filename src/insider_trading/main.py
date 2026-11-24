@@ -3,6 +3,7 @@ import logging
 from insider_trading.api.edgar.fetch_index_files import FetchIndexFiles
 from insider_trading.api.edgar.fetch_target_forms import FetchTargetForms
 from insider_trading.api.edgar.parse_index_files import ParseIndexFiles
+from insider_trading.api.edgar.parse_target_forms import ParseTargetForms
 from insider_trading.infrastructure.logging_config import configure_logging
 
 configure_logging()
@@ -20,8 +21,9 @@ parser = ParseIndexFiles()
 form_links = parser.extract_form_links(index_file_content, form_type="4")
 
 target_form_fetcher = FetchTargetForms()
-target_forms = target_form_fetcher.fetch_forms(form_links)
 
-print(f"Fetched {len(target_forms)} target forms")
+target_forms = target_form_fetcher.fetch_forms(form_links[0:5])
 
-print(target_forms[:5])  # Print the first 5 target forms for inspection
+target_form_parser = ParseTargetForms()
+
+print(target_form_parser.parse_form_four(target_forms[1], form_links[1]))
